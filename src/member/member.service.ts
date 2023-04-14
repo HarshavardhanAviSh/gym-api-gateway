@@ -5,37 +5,57 @@ import * as bcrypt from 'bcrypt';
 import { Neo4jService } from '@brakebein/nest-neo4j';
 import { User } from 'src/models/user.model';
 import { NotFoundException } from '@nestjs/common/exceptions';
+import { mergeScan } from 'rxjs';
 
 @Injectable()
 export class MemberService {
   constructor(private neo: Neo4jService) {
 
   }
+  // async create(dto: CreateMemberDto) {
+  //   try {
+  //     const encryptedPassword = bcrypt.hashSync(dto.password, 10);
+  //     const query= await this.neo.write(`merge (m:member {firstName:"${dto.firstName}",
+  //     lastName:"${dto.lastName}",
+  //     email:"${dto.email}",
+  //     mobileNo:"${dto.mobileNo}",
+  //     password:"${dto.password}"
+  //   ,memberId:"${dto.memberId}" }) 
+  //    return m
+  //    union
+  //    merge(g:gym {gymId: "${dto.gymId}"})-[r:HAS_MEMBER]->(m:member{memberId:"${dto.memberId}"}) return m`);
+
+  //   return { data: query, msg:"ok"}
+  //   } catch (error) {
+  //     return new HttpException(error, 503);
+  //   }
+  // }
+
   async create(dto: CreateMemberDto) {
     try {
+
+      const crypto = require('crypto');
+      const memberId = crypto.randomUUID(); 
+
       const encryptedPassword = bcrypt.hashSync(dto.password, 10);
-      const roles = ['MEMBER'];
+      const query= await this.neo.write(`
+      CREATE (m:Member {firstName:"${dto.firstName}",
+      lastName:"${dto.lastName}", 
+      email:"${dto.email}",
+      mobileNo:"${dto.mobileNo}",
+      password:"${dto.password}",
+      memberId:"${dto.memberId}" }) 
+      return m
+      union
+      merge(g:gym {gymId: "${dto.gymId}"})-[r:HAS_MEMBER]->(m:member{memberId:"${dto.memberId}"}) return m`);
 
-      const query = `CREATE (u:User {firstName:"${dto.firstName}",lastName:"${dto.lastName}",email:"${dto.email}",
-            mobileNo:"${dto.mobileNo}", password:"${encryptedPassword}"
-        }) SET u.roles = $roles, u.id=apoc.create.uuid() return u
-        ` ;
-      const params = { roles: roles };
-      const res = await this.neo.write(query, params);
-      let member: User;
-      if (res.length > 0) {
-        res.map(r => {
-          console.log("memebr=>", r.u);
-          member = r.u;
-        })
+      console.log("GymID->",dto.gymId);
+      console.log("MemberID->",dto.memberId);
 
-        let c = await this.neo.write(`MATCH (g:Gym),(u:User) WHERE g.id="${dto.gymId}" AND u.id="${member.id}" CREATE (g)-[r:HAS_MEMBER]->(u) return u`);
-        console.log(c);
-        return "member created successfully";
-      } else {
-        throw new BadRequestException("failed to create member in the database");
-      }
+     
+      
 
+    return { data: query, msg:"ok"}
     } catch (error) {
       return new HttpException(error, 503);
     }
@@ -86,3 +106,5 @@ export class MemberService {
     }
   }
 }
+
+

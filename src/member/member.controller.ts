@@ -37,25 +37,25 @@ export class MemberController {
     return await this.memberService.remove(id);
   }
 
-  @Post('/imageupload')
-  @UseInterceptors(FileInterceptor('image', {
-    dest: '/images'
-  }))
-  uploadPics(@UploadedFile(new ParseFilePipe({
-    validators: [
-      new FileTypeValidator({
-        fileType: 'image/png'
-      }),
-      new MaxFileSizeValidator({
-        maxSize: 2000000
-      }),
+  // @Post('/imageupload')
+  // @UseInterceptors(FileInterceptor('image', {
+  //   dest: '/images'
+  // }))
+  // uploadPics(@UploadedFile(new ParseFilePipe({
+  //   validators: [
+  //     new FileTypeValidator({
+  //       fileType: 'image/png'
+  //     }),
+  //     new MaxFileSizeValidator({
+  //       maxSize: 2000000
+  //     }),
 
 
-    ]
-  })) file: Express.Multer.File) {
-    console.log(file);
-    return "image uploaded successfully"
-  }
+  //   ]
+  // })) file: Express.Multer.File) {
+  //   console.log(file);
+  //   return "image uploaded successfully"
+  // }
 
   @Post('/bulkupload')
   @UseInterceptors(FileInterceptor('file', {

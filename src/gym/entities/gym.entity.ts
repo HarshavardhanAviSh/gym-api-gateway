@@ -1,5 +1,5 @@
 export interface Gym {
-    id: string;
+    gymId: string;
     gymName: string;
     email: string;
     panNo: string;

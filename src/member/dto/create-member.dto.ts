@@ -1,10 +1,10 @@
 export class CreateMemberDto {
-    id?: string;
+    memberId?: string;
     firstName: string;
     lastName: string;
     email: string;
     mobileNo: string;
-    password: string;
+    password: string;   
     roles: string[];
     gymId: string;
 }

@@ -13,6 +13,7 @@ import { LocalStrategy } from "./strategy/local.strategy";
       secret: 'Teng!n@404',
       signOptions: { expiresIn: '600000s' }
     }),
+    
 
   ],
   controllers: [AuthController],
